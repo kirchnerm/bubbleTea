@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<body>
+
+<!-- load the d3.js library -->    	
+<script src="./node_modules/d3/build/d3.min.js"></script>
+<script>
+
+    var margin = {top: 20, right: 20, bottom: 30, left: 50},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+        
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
+                
+    let x = d3.scaleLinear().range([0,width]).domain([0,100]);
+    let y = d3.scaleLinear().range([height,0]).domain([0,100]);
+
+    let draw = (circles) => {
+        let color = d3.schemeCategory20;
+        var circles = svg.selectAll("circle").data(circles);
+        
+        circles
+            .transition().duration(2000)
+                .attr("cx", function(d) { return x(d.x) } )
+                .attr("cy", function(d) { return y(d.y) } )
+                .attr("r", function(d) { return d.r } ) 
+                
+        circles.enter()
+                .append("circle")
+                        .transition()
+                          .attr("cx", function(d) { return x(d.x) } )
+                          .attr("cy", function(d) { return y(d.y) } )
+                          .attr("fill", function(d,i) { return color[d.c] } )  
+                          .attr("r", 0 )
+                            .transition()
+                                .duration(2000)
+                                .attr("r", function(d) { return d.r } )
+                          
+        circles.exit()
+            .transition().duration(2000)
+                .attr("r","0")
+            .remove();
+    }
+
+    let getCircle = () => {
+        return {
+            x: getRandomArbitrary(0,100),
+            y: getRandomArbitrary(0,100),
+            r: getRandomArbitrary(10,100),
+            c: getRandomArbitrary(0,19)
+        }
+    }
+    
+    let getRandomArbitrary = (min, max) => {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }   
+    
+    let pushNewCircle = () => {
+        circles.push(getCircle());
+        numOfcircles++
+    }
+    
+    
+    let circles = [];
+    let numOfcircles = 0;
+    
+    pushNewCircle();
+    pushNewCircle();
+    pushNewCircle();
+    
+    draw(circles);
+    
+    d3.interval(function() {
+        for(i=0; i < numOfcircles; i++) {
+            circles[i] = getCircle(); 
+        }
+        
+        let decicion = getRandomArbitrary(0,2);
+        
+        if(decicion === 1) {
+            pushNewCircle();
+        }
+        if(decicion === 2 && numOfcircles > 200) {
+            circles.shift();
+            numOfcircles--;
+        }
+        
+        draw(circles);            
+    
+    }, 1000);
+</script>

@@ -1,0 +1,7 @@
+{
+  "name": "bubbleTea",
+  "version": "1.0",
+  "dependencies": {
+    "d3": "^4.7.4"
+  }
+}
